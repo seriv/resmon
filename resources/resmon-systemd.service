@@ -9,4 +9,4 @@ ExecStart=/opt/resmon/resmon
 Restart=always
 
 [Install]
-WantedBy=multy-user.target
+WantedBy=multi-user.target
