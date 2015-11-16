@@ -13,7 +13,7 @@ use POSIX qw( :sys_wait_h setsid );
 use Getopt::Long;
 use Data::Dumper;
 use vars qw($config_file $debug $status_file $interface $port $config
-$status $update);
+$status $update $pid_file);
 
 use Resmon::Config;
 use Resmon::ExtComm;
@@ -26,6 +26,7 @@ GetOptions(
     "d"   => \$debug,
     "f=s" => \$status_file,
     "u"   => \$update,
+    "r=s" => \$pid_file,
 );
 
 if ($update) {
@@ -42,6 +43,7 @@ sub configure {
     $config->{statusfile} = $status_file if($status_file);
     $config->{port} = $port if($port);
     $config->{interface} = $interface if($interface);
+    $config->{pidfile} = $pid_file if ($pid_file);
 }
 
 configure();
@@ -77,7 +79,15 @@ unless($debug) {
     open(STDIN, "</dev/null");
     open(STDOUT, ">/dev/null");
     open(STDERR, ">/dev/null");
-    fork && exit;
+    my $pid=fork;
+    if ($pid) {
+      if (my $PIDFILE=$config->{pidfile}) {
+        open(PIDFILE,">$PIDFILE") or die "can't open >$PIDFILE";
+        print PIDFILE $pid;
+        close PIDFILE or die "can't close $PIDFILE";
+      }
+      exit;
+    }
 }
 
 my $list = [];

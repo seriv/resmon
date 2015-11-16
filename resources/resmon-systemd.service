@@ -5,8 +5,10 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart=/opt/resmon/resmon
+ExecStart=/opt/resmon/resmon -r /run/resmon.pid
 Restart=on-failure
+PIDFile=/run/resmon.pid
+ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
