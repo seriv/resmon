@@ -79,12 +79,13 @@ unless($debug) {
     open(STDIN, "</dev/null");
     open(STDOUT, ">/dev/null");
     open(STDERR, ">/dev/null");
-    my $pid=fork;
+    my $pid = fork;
     if ($pid) {
-      if (my $PIDFILE=$config->{pidfile}) {
-        open(PIDFILE,">$PIDFILE") or die "can't open >$PIDFILE";
-        print PIDFILE $pid;
-        close PIDFILE or die "can't close $PIDFILE";
+      if ($config->{pidfile}) {
+        open(my $pidfh, '>', $config->{pidfile}) or
+          die "can't open >$config->{pidfile}: $!";
+        print $pidfh $pid;
+        close $pidfh or die "can't close $config->{pidfile}: $!";
       }
       exit;
     }
