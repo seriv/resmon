@@ -99,7 +99,7 @@ sub handler {
     connect($h, $s);
     $c->add($h);
     my ($fd) = $c->can_write($timeout);
-    if ($fd == $h) {
+    if (defined($fd) && (fileno($fd) == fileno($h))) {
         my $error = unpack("s", getsockopt($h, Socket::SOL_SOCKET, Socket::SO_ERROR));
         if ($error != 0) {
             close($h);
@@ -107,7 +107,7 @@ sub handler {
         }
         print $h $config->{'prepost'}."\r\n" if ($config->{'prepost'});
         ($fd) = $c->can_read($timeout);
-        if ($fd == $h) {
+        if (defined($fd) && (fileno($fd) == fileno($h))) {
             chomp($banner = <$h>);
             print $h $config->{'post'} if ($config->{'post'});
             close($h);
